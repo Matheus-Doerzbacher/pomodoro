@@ -1,27 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:pomodoro/store/pomodoro_store.dart';
+import 'package:pomodoro/widgets/cronometro.dart';
 import 'package:pomodoro/widgets/entrada_tempo.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 class PomodoroPage extends StatelessWidget {
   const PomodoroPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final store = Provider.of<PomodoroStore>(context);
+
+    return Scaffold(
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text("Pomodoro"),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              EntradaTempo(
-                titulo: "Trabalho",
-                valor: 25,
+          const Expanded(
+            child: Cronometro(),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Observer(
+                builder: (_) => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    EntradaTempo(
+                      titulo: "Trabalho",
+                      valor: store.tempoTrabalho,
+                      incrementar: store.incrementarTempoTrabalho,
+                      decrementar: store.decremenarTempoTrabalho,
+                    ),
+                    EntradaTempo(
+                      titulo: "Descanso",
+                      valor: store.tempoDescanso,
+                      incrementar: store.incrementarTempoDescanso,
+                      decrementar: store.decremenarTempoDescanso,
+                    ),
+                  ],
+                ),
               ),
-              EntradaTempo(
-                titulo: "Descanso",
-                valor: 5,
-              ),
-            ],
+            ),
           )
         ],
       ),
