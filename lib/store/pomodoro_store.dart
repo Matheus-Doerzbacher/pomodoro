@@ -20,10 +20,10 @@ abstract class _PomodoroStore with Store {
   int segundos = 0;
 
   @observable
-  int tempoTrabalho = 2;
+  int tempoTrabalho = 15;
 
   @observable
-  int tempoDescanso = 1;
+  int tempoDescanso = 5;
 
   @observable
   TipoIntervalo tipoIntervalo = TipoIntervalo.trabalho;
@@ -33,7 +33,7 @@ abstract class _PomodoroStore with Store {
   @action
   void iniciar() {
     iniciado = true;
-    cronometro = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+    cronometro = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (minutos == 0 && segundos == 0) {
         _trocarTipoIntervalo();
       } else if (segundos == 0) {
