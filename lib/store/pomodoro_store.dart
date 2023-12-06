@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:mobx/mobx.dart';
 
 part 'pomodoro_store.g.dart';
@@ -26,36 +28,76 @@ abstract class _PomodoroStore with Store {
   @observable
   TipoIntervalo tipoIntervalo = TipoIntervalo.trabalho;
 
+  Timer? cronometro;
+
   @action
   void iniciar() {
     iniciado = true;
+    cronometro = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (minutos == 0 && segundos == 0) {
+        _trocarTipoIntervalo();
+      } else if (segundos == 0) {
+        segundos = 59;
+        minutos--;
+      } else {
+        segundos--;
+      }
+    });
   }
 
   @action
   void parar() {
     iniciado = false;
+    cronometro?.cancel();
   }
 
   @action
   void reiniciar() {
-    minutos = 0;
+    parar();
+    minutos = estaTrabalhando() ? tempoTrabalho : tempoDescanso;
     segundos = 0;
-    iniciado = false;
   }
 
   @action
-  void incrementarTempoTrabalho() => tempoTrabalho++;
+  void incrementarTempoTrabalho() {
+    tempoTrabalho++;
+    if (estaTrabalhando()) reiniciar();
+  }
 
   @action
-  void decremenarTempoTrabalho() => tempoTrabalho--;
+  void decremenarTempoTrabalho() {
+    if (tempoTrabalho > 1) {
+      tempoTrabalho--;
+      if (estaTrabalhando()) reiniciar();
+    }
+  }
 
   @action
-  void incrementarTempoDescanso() => tempoDescanso++;
+  void incrementarTempoDescanso() {
+    tempoDescanso++;
+    if (estaDescansando()) reiniciar();
+  }
 
   @action
-  void decremenarTempoDescanso() => tempoDescanso--;
+  void decremenarTempoDescanso() {
+    if (tempoDescanso > 1) {
+      tempoDescanso--;
+      if (estaDescansando()) reiniciar();
+    }
+  }
 
   bool estaTrabalhando() => tipoIntervalo == TipoIntervalo.trabalho;
 
   bool estaDescansando() => tipoIntervalo == TipoIntervalo.descanso;
+
+  void _trocarTipoIntervalo() {
+    if (estaTrabalhando()) {
+      tipoIntervalo = TipoIntervalo.descanso;
+      minutos = tempoDescanso;
+    } else {
+      tipoIntervalo = TipoIntervalo.trabalho;
+      minutos = tempoTrabalho;
+    }
+    segundos = 0;
+  }
 }

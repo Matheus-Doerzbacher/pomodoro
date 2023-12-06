@@ -5,15 +5,15 @@ import 'package:provider/provider.dart';
 class EntradaTempo extends StatelessWidget {
   final String titulo;
   final int valor;
-  final void Function() incrementar;
-  final void Function() decrementar;
+  final void Function()? incrementar;
+  final void Function()? decrementar;
 
   const EntradaTempo({
     super.key,
     required this.titulo,
     required this.valor,
-    required this.incrementar,
-    required this.decrementar,
+    this.incrementar,
+    this.decrementar,
   });
 
   @override
